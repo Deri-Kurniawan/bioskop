@@ -4,33 +4,42 @@
     <h1 class="text-center">Search Movie</h1>
 
     <form class="form-group" method="GET" id="search-movie">
-        <div class="form-floating">
+        <div class="form-floating mt-4">
             <input type="search" name="search" id="search" class="form-control" placeholder="Search Movie">
             <label for="search">Search Movie</label>
         </div>
     </form>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-3" id="movie-box">
-
-
-
-    </div>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-3" id="movie-box"></div>
 </div>
 
 <script>
     $('#search-movie').on('submit', (e) => {
+        let movieBox = $('#movie-box');
+        // clear box
+        movieBox.html('');
+
+        // don't refresh after submit
         e.preventDefault();
+
         $.ajax({
             url: `https://www.omdbapi.com/?apikey=58e7e859&s=` + $('#search').val(),
             method: 'GET',
             success: (res) => {
                 let movies = JSON.parse(JSON.stringify(res));
-                $('movie-box').html(' ');
-                movies.Search.forEach(movie => {
-                    let element = `
+                if (movies.Response === 'False') {
+                    movieBox.prepend(`
+                        <div class="col-12 text-center alert alert-danger alert-dismissible fade-show" data-role="alert">
+                            ${movies.Error}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                } else {
+                    movies.Search.forEach(movie => {
+                        let element = `
                     <div class="col">
                         <div class="card">
-                            <img src="${movie.Poster}" class="card-img-top" alt="${movie.Title} Images">
+                            <img src="${movie.Poster}" class="card-img-top" alt="Poster Images">
                             <div class="card-body">
                                 <h5 class="card-title">${movie.Title}</h5>
                                 <p class="card-text">${movie.Plot}</p>
@@ -38,9 +47,9 @@
                         </div>
                     </div>
                     `;
-
-                    $('#movie-box').append(element);
-                });
+                        movieBox.append(element);
+                    });
+                }
             }
         });
     })
