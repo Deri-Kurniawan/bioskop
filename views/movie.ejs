@@ -1,0 +1,50 @@
+<%- include('./layouts/header') %>
+<%- include('./layouts/utils/navbar') %>
+<div class="container my-5">
+    <h1 class="text-center">Search Movie</h1>
+
+    <form class="form-group" method="GET" id="search-movie">
+        <div class="form-floating">
+            <input type="search" name="search" id="search" class="form-control" placeholder="Search Movie">
+            <label for="search">Search Movie</label>
+        </div>
+    </form>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-3" id="movie-box">
+
+
+
+    </div>
+</div>
+
+<script>
+    $('#search-movie').on('submit', (e) => {
+        e.preventDefault();
+        $.ajax({
+            url: `https://www.omdbapi.com/?apikey=58e7e859&s=` + $('#search').val(),
+            method: 'GET',
+            success: (res) => {
+                let movies = JSON.parse(JSON.stringify(res));
+                $('movie-box').html(' ');
+                movies.Search.forEach(movie => {
+                    let element = `
+                    <div class="col">
+                        <div class="card">
+                            <img src="${movie.Poster}" class="card-img-top" alt="${movie.Title} Images">
+                            <div class="card-body">
+                                <h5 class="card-title">${movie.Title}</h5>
+                                <p class="card-text">${movie.Plot}</p>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+
+                    $('#movie-box').append(element);
+                });
+                console.log(movies);
+                console.log(movies.Title);
+            }
+        });
+    })
+</script>
+<%- include('./layouts/footer') %>
